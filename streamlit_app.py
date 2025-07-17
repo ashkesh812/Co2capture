@@ -40,8 +40,12 @@ def compute_targets(row):
     except:
         return pd.Series([np.nan, np.nan])
 
-df[["eta_CO2_des", "SEEC"]] = df.apply(compute_targets, axis=1)
-df = df.dropna(subset=["eta_CO2_des", "SEEC", "pH1", "Conductivity1 (mS/cm)", "Solvent_Flow (ml/min)"])
+if all(col in df.columns for col in ["Voltage (V)", "Measured_Current (A)", "CO2_out (%)"]):
+    df[["eta_CO2_des", "SEEC"]] = df.apply(compute_targets, axis=1)
+    df = df.dropna(subset=["eta_CO2_des", "SEEC", "pH1", "Conductivity1 (mS/cm)", "Solvent_Flow (ml/min)"])
+else:
+    st.error("❌ Required columns for computing `eta_CO2_des` and `SEEC` are missing.")
+    st.stop()
 
 # Inputs and outputs
 input_cols = ["Current_Set (A)", "Gas_Flow_Rate (m3/h)", "Timestamp"]
