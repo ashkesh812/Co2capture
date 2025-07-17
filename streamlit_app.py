@@ -27,8 +27,21 @@ output_cols = [
     "pH1", "Conductivity1 (mS/cm)", "Temp_pH1 (°C)", "Solvent_Flow (ml/min)"
 ]
 
+for col in input_cols:
+    df[col] = pd.to_numeric(df[col], errors='coerce')
+
+df = df.dropna(subset=input_cols)
 X = df[input_cols].astype(float).values
-Y = df[output_cols].astype(float).values
+
+# Ensure all output columns exist
+available_outputs = [col for col in output_cols if col in df.columns]
+missing_outputs = [col for col in output_cols if col not in df.columns]
+
+if missing_outputs:
+    st.warning(f"⚠️ These output columns were missing: {missing_outputs}")
+
+df = df.dropna(subset=available_outputs)
+Y = df[available_outputs].astype(float).values
 
 input_scaler = StandardScaler().fit(X)
 output_scaler = StandardScaler().fit(Y)
