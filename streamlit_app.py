@@ -27,7 +27,12 @@ output_cols = [
     "pH1", "Conductivity1 (mS/cm)", "Temp_pH1 (°C)", "Solvent_Flow (ml/min)"
 ]
 
+for col in input_cols:
+    df[col] = pd.to_numeric(df[col], errors="coerce")
+
+df = df.dropna(subset=input_cols)  # Remove rows with non-numeric input
 X = df[input_cols].astype(float).values
+
 Y = df[output_cols].astype(float).values
 
 input_scaler = StandardScaler().fit(X)
