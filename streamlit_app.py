@@ -12,12 +12,14 @@ model = PINNModel(input_dim=3, output_dim=8)
 model.load_state_dict(torch.load("pinn_model.pt"))
 model.eval()
 
-# Load scalers
-df = pd.read_csv("./Parsed_Data/combined_co2_concentration.csv").merge(
-    pd.read_csv("./Parsed_Data/combined_current_voltage.csv"), on=["Timestamp", "Current_Set (A)", "Gas_Flow_Rate (m3/h)"]
-).merge(
-    pd.read_csv("./Parsed_Data/combined_ph_conductivity.csv"), on=["Timestamp", "Current_Set (A)", "Gas_Flow_Rate (m3/h)"]
-)
+# Load scalers and parsed data
+co2_df = pd.read_csv("./Parsed_Data/combined_co2_concentration.csv")
+co2_df.rename(columns={"Current (A)": "Current_Set (A)"}, inplace=True)
+cv_df = pd.read_csv("./Parsed_Data/combined_current_voltage.csv")
+ph_df = pd.read_csv("./Parsed_Data/combined_ph_conductivity.csv")
+
+df = co2_df.merge(cv_df, on=["Timestamp", "Current_Set (A)", "Gas_Flow_Rate (m3/h)"])
+df = df.merge(ph_df, on=["Timestamp", "Current_Set (A)", "Gas_Flow_Rate (m3/h)"])
 
 input_cols = ["Current_Set (A)", "Gas_Flow_Rate (m3/h)", "Timestamp"]
 output_cols = [
